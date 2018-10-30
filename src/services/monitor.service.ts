@@ -22,7 +22,7 @@ export class MonitorService {
     return result;
   }
 
-  public readSignals(data): Promise<any> {
+  private readSignals(data): Promise<any> {
     return new Promise((resolve, reject) => {
       let buffer: Array <any> = [];
 
@@ -32,5 +32,9 @@ export class MonitorService {
         error: error => reject(error)
       });
     })
+  }
+
+  private processData(data) {
+    let headers = 
   }
 }
