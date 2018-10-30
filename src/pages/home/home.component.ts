@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MonitorService } from 'src/services/monitor.service';
 
 @Component({
   selector: 'app-home',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() {}
+  constructor(
+    private monitorService: MonitorService,
+  ) {}
 
   ngOnInit() {
+    this.monitorService.getCompressorData()
+      .then(res => { console.log(res) })
   }
 
+  readSignals() {
+  }
 }
