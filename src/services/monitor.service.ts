@@ -18,9 +18,7 @@ export class MonitorService {
 
   public async getCompressorData() {
     const response = await this.http.get(URL, { responseType: 'blob' }).toPromise();
-    console.log(response)
     const result = await this.readSignals(response);
-    console.log(result)
     return result;
   }
 
@@ -29,9 +27,9 @@ export class MonitorService {
       let buffer: Array <any> = [];
 
       this.papa.parse(data, {
-        chunk: partialResult => { console.log(partialResult); [...buffer, partialResult] },
-        complete: result => { console.log('done'); resolve(buffer) },
-        error: error => { console.log(error); reject(error) }
+        chunk: partialResult => { buffer = [...buffer, partialResult] },
+        complete: result => resolve(buffer),
+        error: error => reject(error)
       });
     })
   }

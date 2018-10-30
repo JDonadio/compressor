@@ -9,7 +9,7 @@ import { routes } from './app.routes';
 
 // PAGES
 import { AppComponent } from './app.component';
-import { HomeComponent } from '../pages/home/home.component';
+import { HomeComponent } from './pages/home/home.component';
 
 // SERVICES
 import { MonitorService } from '../services/monitor.service';
