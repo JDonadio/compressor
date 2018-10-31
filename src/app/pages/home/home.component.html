@@ -4,6 +4,11 @@
 <!-- error message -->
 <div *ngIf="error">An error occurs</div>
 
+<div *ngIf="!loadingData">
+  <button (click)="init()" *ngIf="!activeCounter">Init</button>
+  <button (click)="stop()" *ngIf="activeCounter">Stop</button>
+</div>
+
 <!-- data -->
 <div *ngIf="data && !loadingData">
   <p>Data loaded successfully {{data.length}}</p>
@@ -13,8 +18,8 @@
       <td *ngFor="let h of data.headers">{{h | uppercase}}</td>
     </tr>
 
-    <tr *ngFor="let s of data.signals">
-      <td *ngFor="let v of s">{{v | uppercase}}</td>
+    <tr *ngFor="let p of tablePage">
+      <td *ngFor="let v of p">{{v | uppercase}}</td>
     </tr>
   </table>
 </div>

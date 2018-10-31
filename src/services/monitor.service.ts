@@ -21,7 +21,7 @@ export class MonitorService {
   }
 
   public getCompressorData(slice: number) {
-    return { headers: this.data.headers, content: this.data.content.slice(slice-1, slice) }
+    return { headers: this.data.headers, content: this.data.content.slice(slice-1, slice)[0] }
   }
 
   public async loadCompressorData() {
