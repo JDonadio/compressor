@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+
 import { MonitorService } from 'src/services/monitor.service';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-home',
@@ -9,31 +11,38 @@ import { MonitorService } from 'src/services/monitor.service';
 export class HomeComponent implements OnInit {
   public loadingData: boolean;
   public error: boolean;
-  public data: Array<any>;
+  public data: Object;
 
   constructor(
     private monitorService: MonitorService,
   ) {
     this.loadingData = false;
-    this.data = null;
+    this.data = {
+      headers: null,
+      signals: null,
+    };
     this.error = null;
   }
   
   ngOnInit() {
     this.loadingData = true;
-    this.monitorService.getCompressorData()
-      .then(success => this.onSuccessGetData(success))
-      .catch(err => this.onErrorGetData(err))
+    this.monitorService.loadCompressorData()
+      .then(() => this.onSuccessGetData())
+      .catch(() => this.onErrorGetData())
   }
 
-  onSuccessGetData(data) {
-    console.log('Data buffer', data);
-    this.data = data;
+  onSuccessGetData() {
+    this.data = this.monitorService.getCompressorData(1);
+    console.log('Data buffer', this.data);
+    this.loadingData = false;
     this.error = false;
   }
-
-  onErrorGetData(err) {
-    console.log('Error getting data', err);
+  
+  onErrorGetData() {
+    console.log('err');
+    this.loadingData = false;
     this.error = true;
   }
+
+
 }

@@ -1,3 +1,20 @@
-<p>
-  home works!
-</p>
+<!-- loading spinner -->
+<div *ngIf="loadingData">Loading data...</div>
+
+<!-- error message -->
+<div *ngIf="error">An error occurs</div>
+
+<!-- data -->
+<div *ngIf="data && !loadingData">
+  <p>Data loaded successfully {{data.length}}</p>
+  
+  <table>
+    <tr>
+      <td *ngFor="let h of data.headers">{{h | uppercase}}</td>
+    </tr>
+
+    <tr *ngFor="let s of data.signals">
+      <td *ngFor="let v of s">{{v | uppercase}}</td>
+    </tr>
+  </table>
+</div>
