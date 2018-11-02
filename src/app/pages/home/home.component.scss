@@ -1,0 +1,26 @@
+.content {
+  margin: 2rem;
+  table {
+    margin-top: 1.5rem;
+    text-align: center;
+    padding: 5%;
+    width: 90%;
+    border: 1px solid gray;
+  }
+  tr, td {
+    border: 1px solid gray;
+  }
+}
+.controls {
+  button { 
+    padding: 5px 10px 5px 10px;
+    margin: 2px;
+  }
+}
+.smaller { 
+  color: red;
+}
+.greater { 
+  color: green;
+  font-weight: 400;
+}
