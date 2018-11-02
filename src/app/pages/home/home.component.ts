@@ -7,7 +7,7 @@ class Data {
   public headers: Array<string> = [];
   public content: Array<Object> = [];
 }
-const ENTRIES_IN_PAGE: number = 74;
+const RECORDS_IN_PAGE: number = 74;
 
 @Component({
   selector: 'app-home',
@@ -53,9 +53,9 @@ export class HomeComponent implements OnInit {
   public init() {
     this.activeInterval = true;
     this.interval = setInterval(() => {
-      var currentPage = ENTRIES_IN_PAGE * this.pageNumber;
+      var currentPage = RECORDS_IN_PAGE * this.pageNumber;
       this.previousDataTable = _.clone(this.currentDataTable);
-      this.currentDataTable = this.data.content.slice(currentPage - ENTRIES_IN_PAGE, currentPage);
+      this.currentDataTable = this.data.content.slice(currentPage - RECORDS_IN_PAGE, currentPage);
       this.pageNumber++;
     }, this.refresher * 1000);
   }

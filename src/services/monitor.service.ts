@@ -21,7 +21,7 @@ export class MonitorService {
   }
 
   /**
-   * Returns the number of chunks specified as 'slice' parameter. Around ~177601 entries
+   * Returns the number of chunks specified as 'slice' parameter. Around ~177601 records
    * @param slice chunk number of the whole data loaded array
    */
   public getCompressorData(slice: number) {
@@ -42,7 +42,7 @@ export class MonitorService {
 
   /**
    * Use Papaparse library to read and parse the csv file content
-   * Every chunk contain around ~177601 entries
+   * Every chunk contain around ~177601 records
    * Once parse process is completed return a buffer which contains all the records
    * @param data blob data response
    */
