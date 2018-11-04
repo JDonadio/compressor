@@ -19,11 +19,12 @@ export class HomeComponent implements OnInit {
   public activeInterval: boolean;
   public error: boolean;
   public data: Data;
-  public interval: any;
-  public pageNumber: number;
-  public previousDataTable: Array<object>;
   public currentDataTable: Array<object>;
   public refresher: number;
+
+  private interval: any;
+  private pageNumber: number;
+  private previousDataTable: Array<object>;
 
   constructor(
     private monitorService: MonitorService,
@@ -53,9 +54,10 @@ export class HomeComponent implements OnInit {
   public init() {
     this.activeInterval = true;
     this.interval = setInterval(() => {
-      var currentPage = RECORDS_IN_PAGE * this.pageNumber;
+      var next = RECORDS_IN_PAGE * this.pageNumber;
+      var skip = next - RECORDS_IN_PAGE;
       this.previousDataTable = _.clone(this.currentDataTable);
-      this.currentDataTable = this.data.content.slice(currentPage - RECORDS_IN_PAGE, currentPage);
+      this.currentDataTable = this.data.content.slice(skip, next);
       this.pageNumber++;
     }, this.refresher * 1000);
   }
@@ -85,7 +87,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * Returns a class name regarding a comparisson between the previous value and the new value.
+   * Returns a class name results of a comparison between previous and new value.
    * If nothing change return null.
    * Only compare recvalue and calcvalue fields [3, 4] index of the data table
    * @param row current row in table
@@ -95,8 +97,11 @@ export class HomeComponent implements OnInit {
     if (!this.previousDataTable[row]) return;
     if ([3, 4].indexOf(col) == -1) return;
 
-    if (this.currentDataTable[row][col] < this.previousDataTable[row][col]) return 'smaller';
-    else if (this.currentDataTable[row][col] > this.previousDataTable[row][col]) return 'greater';
+    var prevValue = this.previousDataTable[row][col];
+    var currentValue = this.currentDataTable[row][col];
+
+    if (currentValue < prevValue) return 'smaller';
+    else if (currentValue > prevValue) return 'greater';
     else return null;
   }
 

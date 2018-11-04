@@ -25,7 +25,10 @@ export class MonitorService {
    * @param slice chunk number of the whole data loaded array
    */
   public getCompressorData(slice: number) {
-    return { headers: this.data.headers, content: this.data.content.slice(slice-1, slice)[0] }
+    return { 
+      headers: this.data.headers, 
+      content: this.data.content.slice(slice-1, slice)[0] 
+    }
   }
 
   /**
