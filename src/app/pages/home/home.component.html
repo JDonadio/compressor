@@ -6,40 +6,10 @@
   <div *ngIf="error">An error occurs</div>
   
   <!-- data -->
-  <div *ngIf="data && !loadingData">
-    <p>A chunk of {{data.content.length}} are successfully loaded</p>
-  
-    <div *ngIf="!loadingData" class="controls">
-      <div>Refresh table every: {{refresher}} seconds</div>
-  
-      <button (click)="backward()" [disabled]="!activeInterval">
-        <i class="fa fa-backward" aria-hidden="true"></i>
-      </button>
-      <button (click)="stop()" [disabled]="!activeInterval">
-        <i class="fa fa-stop" aria-hidden="true"></i>
-      </button>
-      <button (click)="pause()" *ngIf="activeInterval">
-        <i class="fa fa-pause" aria-hidden="true"></i>
-      </button>
-      <button (click)="init()" *ngIf="!activeInterval">
-        <i class="fa fa-play" aria-hidden="true"></i>
-      </button>
-      <button (click)="forward()" [disabled]="!activeInterval">
-        <i class="fa fa-forward" aria-hidden="true"></i>
-      </button>
-    </div>
-  
-    <table *ngIf="currentDataTable[0]">
-      <tr>
-        <td *ngFor="let header of data.headers">{{header | uppercase}}</td>
-      </tr>
-  
-      <tr *ngFor="let row of currentDataTable; let i = index">
-        <td *ngFor="let col of row; let j = index">
-          <span *ngIf="j == 0">{{col | date : 'medium'}}</span>
-          <span *ngIf="j > 0" [ngClass]="getClassForCell(i,j)">{{col | uppercase}}</span>
-        </td>
-      </tr>
-    </table>
+  <div *ngIf="currentData && !loadingData">
+    <p>A chunk of {{currentData.content.length}} records are successfully loaded</p>
+
+    <div>First date: {{firstDate | date: 'medium'}}</div>
+    <div>Latest date: {{latestDate | date: 'medium'}}</div>
   </div>
 </div>
