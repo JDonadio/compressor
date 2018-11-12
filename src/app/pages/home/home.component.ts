@@ -8,6 +8,8 @@ class Data {
   public content: Array<Object> = [];
 }
 const ACTIVE_POWER_THRESHOLD: number = 100;
+const _THRESHOLD: number = 100;
+const IDLE_THRESHOLD: number = 0.2 * ACTIVE_POWER_THRESHOLD;
 
 @Component({
   selector: 'app-home',
@@ -54,13 +56,19 @@ export class HomeComponent implements OnInit {
     _.each(dataChunk, (record: any) => {
       if (record.indexOf('Psum_kW') > -1) {
         record[3] = (+record[3]).toFixed(4);
-        record[4] = (+record[4]).toFixed(4);
+        record[4] = this.determinateState(record[3]);
         psumRecords = [...psumRecords, record];
       }
     })
     this.latestDate = dataChunk[dataChunk.length-1][0];
     this.chunk++;
     return psumRecords;
+  }
+
+  determinateState(activePower): string {
+    if (activePower === 0) return 'unloaded';
+    if (activePower < IDLE_THRESHOLD && activePower > 0) return 'idle';
+    if (activePower > IDLE_THRESHOLD) return 'loaded';
   }
   
   onErrorGetData(error) {

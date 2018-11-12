@@ -5,6 +5,12 @@ import { Papa } from 'ngx-papaparse';
 import * as _ from 'lodash';
 
 const URL = 'assets/signals.csv';
+const HEADERS = [
+  { name: 'DATE', id: 0 },
+  { name: 'METRICID', id: 1 },
+  { name: 'RECVALUE', id: 3 },
+  { name: 'STATE', id: 4 }
+];
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +39,7 @@ export class MonitorService {
   private async loadCompressorData() {
     const resp = await this.http.get(URL, { responseType: 'blob' }).toPromise();
     const content = await this.readAndParseContent(resp);
-    this.data = { headers: content[0].shift(), content };
+    this.data = { headers: HEADERS, content };
     console.log('Data loaded successfully.');
     return this.data;
   }

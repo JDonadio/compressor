@@ -11,5 +11,18 @@
 
     <div>First date: {{firstDate | date: 'medium'}}</div>
     <div>Latest date: {{latestDate | date: 'medium'}}</div>
+
+    <table>
+      <tr>
+        <td *ngFor="let header of currentData.headers">{{header.name | uppercase}}</td>
+      </tr>
+    
+      <tr *ngFor="let row of currentData.content; let i = index">
+        <td *ngFor="let id of [0,1,3,4]; let j = index">
+          <span *ngIf="j == 0">{{row[id] | date : 'medium'}}</span>
+          <span *ngIf="j > 0">{{row[id] | uppercase}}</span>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>
