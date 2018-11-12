@@ -5,6 +5,12 @@ import { Papa } from 'ngx-papaparse';
 import * as _ from 'lodash';
 
 const URL = 'assets/signals.csv';
+const HEADERS = [
+  { name: 'DATE', id: 0 },
+  { name: 'METRICID', id: 1 },
+  { name: 'RECVALUE', id: 3 },
+  { name: 'STATE', id: 4 }
+];
 
 @Injectable({
   providedIn: 'root'
@@ -20,15 +26,9 @@ export class MonitorService {
     console.log('Init monitor service');
   }
 
-  /**
-   * Returns the number of chunks specified as 'slice' parameter. Around ~177601 records
-   * @param slice chunk number of the whole data loaded array
-   */
-  public getCompressorData(slice: number) {
-    return { 
-      headers: this.data.headers, 
-      content: this.data.content.slice(slice-1, slice)[0] 
-    }
+  public async getCompressorData() {
+    var result = await this.loadCompressorData();
+    return result;
   }
 
   /**
@@ -36,11 +36,12 @@ export class MonitorService {
    * Process the blob data separating headers from content
    * Fill the 'data' variable content with the whole processed csv file
    */
-  public async loadCompressorData() {
+  private async loadCompressorData() {
     const resp = await this.http.get(URL, { responseType: 'blob' }).toPromise();
     const content = await this.readAndParseContent(resp);
-    this.data = { headers: content[0].shift(), content };
+    this.data = { headers: HEADERS, content };
     console.log('Data loaded successfully.');
+    return this.data;
   }
 
   /**
