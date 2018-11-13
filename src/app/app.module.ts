@@ -15,6 +15,7 @@ import { HomeComponent } from './pages/home/home.component';
 
 // SERVICES
 import { MonitorService } from '../services/monitor.service';
+import { ChartService } from '../services/chart.service';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,7 @@ import { MonitorService } from '../services/monitor.service';
     PapaParseModule,
     MDBBootstrapModule.forRoot(),
   ],
-  providers: [MonitorService],
+  providers: [MonitorService, ChartService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -4,11 +4,15 @@
   
   <!-- error message -->
   <div *ngIf="error">An error occurs</div>
+
+  <!-- canvas -->
+  <div [hidden]="!currentData.content">
+    <canvas id="activepower">{{ chart }}</canvas>
+  </div>
   
   <!-- data -->
   <div *ngIf="currentData.content && !loadingData">
-    <div>A total of {{currentData.content.length}} records are successfully loaded</div>
-    <div>Chunk: ({{chunk}}/{{completeData.content.length}})</div>
+    <div>Chunk: ({{chunk}}/{{completeData.content.length}}). A total of {{currentData.content.length}} records are successfully loaded</div>
     <div>First date: {{firstDate | date: 'medium'}}</div>
     <div>Latest date: {{latestDate | date: 'medium'}}</div>
 

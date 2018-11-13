@@ -8,7 +8,7 @@ const URL = 'assets/signals.csv';
 const HEADERS = [
   { name: 'DATE', id: 0 },
   { name: 'METRICID', id: 1 },
-  { name: 'RECVALUE', id: 3 },
+  { name: 'ACTIVE POWER', id: 3 },
   { name: 'STATE', id: 4 }
 ];
 
