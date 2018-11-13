@@ -1,26 +1,21 @@
 .content {
   margin: 2rem;
+  text-align: center;
   table {
+    font-size: 10px;
+    display: inline-table;
     margin-top: 1.5rem;
     text-align: center;
     padding: 5%;
-    width: 90%;
+    width: 60%;
     border: 1px solid gray;
   }
   tr, td {
     border: 1px solid gray;
+    font-size: 0.75rem;
   }
-}
-.controls {
-  button { 
-    padding: 5px 10px 5px 10px;
-    margin: 2px;
+  .pagination {
+    display: inherit !important;
+    margin-top: 1.5rem;
   }
-}
-.smaller { 
-  color: red;
-}
-.greater { 
-  color: green;
-  font-weight: 400;
 }
