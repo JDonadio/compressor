@@ -7,7 +7,7 @@ class Data {
   public headers: Array<string> = [];
   public content: Array<Object> = [];
 }
-const ACTIVE_POWER_THRESHOLD: number = 100;
+const ACTIVE_POWER_THRESHOLD: number = 110;
 const IDLE_THRESHOLD: number = 0.2 * ACTIVE_POWER_THRESHOLD;
 
 @Component({
@@ -41,7 +41,7 @@ export class HomeComponent implements OnInit {
     this.latestDate = null;
     this.paginationConfig = {
       currentPage: 0,
-      recordsInPage: 400
+      recordsInPage: 200
     };
   }
   
@@ -68,8 +68,8 @@ export class HomeComponent implements OnInit {
         record[4] = this.getCompressorState(record[3]);
         psumRecords = [...psumRecords, record];
       }
-    })
-    this.latestDate = dataChunk[dataChunk.length-1][0];
+    });
+    this.latestDate = psumRecords[psumRecords.length-1][0];
     this.currentData.content = psumRecords;
     this.pagesInChunk = Math.ceil(this.currentData.content.length / this.paginationConfig.recordsInPage);
     console.log('Current data', this.currentData);
