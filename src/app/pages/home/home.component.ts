@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { MonitorService } from 'src/services/monitor.service';
+import { ChartService } from 'src/services/chart.service';
+import { Chart } from 'chart.js';
 import * as _ from 'lodash';
 
 class Data {
@@ -21,19 +23,25 @@ export class HomeComponent implements OnInit {
   public currentData: Data;
   public completeData: Data;
   public slicedData: any;
+  public xAxis: any;
+  public yAxis: any;
   public firstDate: string;
   public latestDate: string;
   public chunk: number;
   public pagesInChunk: number;
   public paginationConfig: any;
+  public chart: any;
 
   constructor(
     private monitorService: MonitorService,
+    private chartService: ChartService,
   ) {
     this.loadingData = false;
     this.currentData = new Data();
     this.completeData = new Data();
     this.slicedData = [];
+    this.xAxis = [];
+    this.yAxis = [];
     this.error = null;
     this.chunk = 0;
     this.pagesInChunk = 0;
@@ -43,6 +51,7 @@ export class HomeComponent implements OnInit {
       currentPage: 0,
       recordsInPage: 200
     };
+    this.chart = null;
   }
   
   async ngOnInit() {
@@ -86,7 +95,9 @@ export class HomeComponent implements OnInit {
     var skip = (this.paginationConfig.recordsInPage * this.paginationConfig.currentPage)-this.paginationConfig.recordsInPage;
     var next = this.paginationConfig.currentPage * this.paginationConfig.recordsInPage;
     this.slicedData = _.clone(this.currentData.content.slice(skip, next));
+    console.log('Sliced data',this.slicedData)
     if (this.slicedData.length == 0) this.nextChunk();
+    else this.drawChart();
   }
 
   previousPage() {
@@ -98,6 +109,7 @@ export class HomeComponent implements OnInit {
     var skip = (this.paginationConfig.recordsInPage * this.paginationConfig.currentPage)-this.paginationConfig.recordsInPage;
     var next = this.paginationConfig.currentPage * this.paginationConfig.recordsInPage;
     this.slicedData = _.clone(this.currentData.content.slice(skip, next));
+    this.drawChart();
   }
 
   nextChunk() {
@@ -111,6 +123,16 @@ export class HomeComponent implements OnInit {
     this.processDataByChunk({ next: false });
     this.paginationConfig.currentPage = Math.ceil(this.currentData.content.length/this.paginationConfig.recordsInPage-1);
     this.nextPage();
+  }
+
+  drawChart() {
+    let x = [];
+    _.each(this.slicedData, d => { x = [...x, new Date(+d[0]).toLocaleString()] });
+
+    let y = [];
+    _.each(this.slicedData, d => { y = [...y, d[3]] });
+
+    this.chart = this.chartService.drawChart(x, y);
   }
 
   onErrorGetData(error) {
