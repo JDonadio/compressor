@@ -56,7 +56,7 @@ export class MonitorService {
 
       this.papa.parse(data, {
         chunk: partialResult => {
-          newBuffer = _.concat(newBuffer, [...newBuffer, partialResult.data]);
+          newBuffer = [...newBuffer, partialResult.data];
         },
         complete: result => resolve(newBuffer),
         error: error => reject(error)

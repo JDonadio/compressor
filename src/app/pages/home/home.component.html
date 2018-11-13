@@ -6,23 +6,37 @@
   <div *ngIf="error">An error occurs</div>
   
   <!-- data -->
-  <div *ngIf="currentData && !loadingData">
-    <p>A chunk of {{currentData.content.length}} records are successfully loaded</p>
-
+  <div *ngIf="currentData.content && !loadingData">
+    <div>A total of {{currentData.content.length}} records are successfully loaded</div>
+    <div>Chunk: ({{chunk}}/{{completeData.content.length}})</div>
     <div>First date: {{firstDate | date: 'medium'}}</div>
     <div>Latest date: {{latestDate | date: 'medium'}}</div>
+
+    <div class="pagination">
+      Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
+      <button (click)="previousPage()" [disabled]="paginationConfig.currentPage == 1 && chunk == 1">Previous</button>
+      <button (click)="nextPage()" [disabled]="chunk == completeData.content.length && 
+        paginationConfig.currentPage == pagesInChunk">Next</button>
+    </div>
 
     <table>
       <tr>
         <td *ngFor="let header of currentData.headers">{{header.name | uppercase}}</td>
       </tr>
     
-      <tr *ngFor="let row of currentData.content; let i = index">
+      <tr *ngFor="let row of slicedData; let i = index">
         <td *ngFor="let id of [0,1,3,4]; let j = index">
           <span *ngIf="j == 0">{{row[id] | date : 'medium'}}</span>
           <span *ngIf="j > 0">{{row[id] | uppercase}}</span>
         </td>
       </tr>
     </table>
+
+    <div class="pagination">
+      Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
+      <button (click)="previousPage()" [disabled]="paginationConfig.currentPage == 1 && chunk == 1">Previous</button>
+      <button (click)="nextPage()" [disabled]="chunk == completeData.content.length && 
+        paginationConfig.currentPage == pagesInChunk">Next</button>
+    </div>
   </div>
 </div>
