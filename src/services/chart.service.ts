@@ -1,41 +1,47 @@
 import { Injectable } from '@angular/core';
 import { Chart } from 'chart.js';
-import * as _ from 'lodash';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChartService {
-  private opts: any;
 
-  constructor() {
-    this.opts = {
-      legend: {
-        display: true
-      },
-      scales: {
-        xAxes: [{
-          display: true
-        }],
-        yAxes: [{
-          display: true
-        }],
-      }
-    };
-  }
+  constructor() { }
 
   public drawChart(x, y, opts?) {
-    opts = opts ? opts : this.opts;
+    opts = opts ? opts : this.getOptions();
     return new Chart('activepower', {
       type: 'line',
       data: {
         labels: x,
-        datasets: [{
-          data: y,
-          label: 'Active Power',
-        }],
+        datasets: [
+          {
+            data: y,
+            label: 'Active Power',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)'
+          }
+        ],
       },
       options: opts,
     });
   }
+
+  private getOptions() {
+    return {
+      legend: { display: true },
+      scales: {
+        xAxes: [{
+          scaleLabel: {
+            display: true, labelString: 'Date axis'
+          }
+        }],
+        yAxes: [{
+          scaleLabel: {
+            display: true, labelString: 'Active power axis'
+          }
+        }],
+      }
+    };
+  }
 }
+

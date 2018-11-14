@@ -15,11 +15,27 @@
     font-size: 0.75rem;
   }
   .pagination {
+    button {
+      cursor: pointer;
+      margin: .2rem;
+      border-radius: 3px;
+    }
     display: inherit !important;
     margin-top: 1.5rem;
+  }
+  .table-content {
+    margin-top: 2rem;
   }
   canvas {
     max-width: 80%;
     margin: auto;
+  }
+  .go-top {
+    cursor: pointer;
+    color: #00bcd4;
+    opacity: 0.5;
+    position: fixed;
+    bottom: 3em;
+    right: 3em;
   }
 }
