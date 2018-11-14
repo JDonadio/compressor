@@ -9,12 +9,15 @@
   <div [hidden]="!currentData.content">
     <canvas id="activepower">{{ chart }}</canvas>
   </div>
-  
+
+  <!-- scroll to top -->
+  <div class="go-top" *ngIf="showScrollTop">
+    <i (click)="goTop()" class="fa fa-3x fa-arrow-circle-up"></i>
+  </div>
+
   <!-- data -->
-  <div *ngIf="currentData.content && !loadingData">
-    <div>Chunk: ({{chunk}}/{{completeData.content.length}}). A total of {{currentData.content.length}} records are successfully loaded</div>
-    <div>First date: {{firstDate | date: 'medium'}}</div>
-    <div>Latest date: {{latestDate | date: 'medium'}}</div>
+  <div *ngIf="currentData.content && !loadingData" class="table-content">
+    <div>Chunk: ({{chunk}}/{{completeData.content.length}}). A total of {{currentData.content.length}} records are loaded for this chunk.</div>
 
     <div class="pagination">
       Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
