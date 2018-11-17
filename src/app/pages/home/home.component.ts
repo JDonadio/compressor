@@ -5,14 +5,6 @@ import { ChartService } from 'src/services/chart.service';
 import { Chart } from 'chart.js';
 import * as _ from 'lodash';
 
-class Data {
-  public headers: Array<string> = [];
-  public content: Array<Object> = [];
-}
-const ACTIVE_POWER_THRESHOLD: number = 110; // csv max value approach
-const UNLOADED_THRESHOLD: number = 0.2;     // based on derivation monitoring
-const IDLE_THRESHOLD: number = 0.2 * ACTIVE_POWER_THRESHOLD;
-
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -27,8 +19,8 @@ export class HomeComponent implements OnInit {
   public loadingData: boolean;
   public showScrolls: boolean;
   public error: boolean;
-  public currentData: Data;
-  public completeData: Data;
+  public currentData: any;
+  public completeData: any;
   public resumeChunkInformation: any;
   public slicedData: any;
   public chunk: number;
@@ -41,8 +33,8 @@ export class HomeComponent implements OnInit {
     private chartService: ChartService,
   ) {
     this.loadingData = false;
-    this.currentData = new Data();
-    this.completeData = new Data();
+    this.currentData = {};
+    this.completeData = {};
     this.slicedData = [];
     this.error = null;
     this.chunk = 0;
@@ -66,59 +58,16 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * Returns the sliced chunk of data and divide it in pages for a friendly visualization
-   * Process only recvalue and state values of each record
+   * Slice chunk of data and divide it in pages for a friendly visualization
    * @param next boolean: pagination flag
    */
   processDataByChunk(next: boolean) {
     next ? this.chunk++ : this.chunk--;
     if (this.chunk == 0 || this.chunk == this.pagesInChunk) return;
     
-    this.resetResumeChunkInformation();
-    var psumRecords = [];
-    var dataChunk: any = this.completeData.content.slice(this.chunk-1, this.chunk)[0];
-    _.each(dataChunk, (record: any) => {
-      if (record.indexOf('Psum_kW') > -1) {
-        record[3] = (+record[3]).toFixed(4);
-        record[4] = this.getCompressorState(record[3]);
-        psumRecords = [...psumRecords, record];
-        this.processResumeDataByChunk(record[3], record[4]);
-      }
-    });
-    this.currentData.content = psumRecords;
+    this.currentData.content = this.completeData.content.slice(this.chunk - 1, this.chunk)[0];
     this.pagesInChunk = Math.ceil(this.currentData.content.length / this.paginationConfig.recordsInPage);
     console.log('Current data', this.currentData);
-    console.log('Resume chunk', this.resumeChunkInformation);
-  }
-
-  processResumeDataByChunk(activePower, state) {
-    var max = this.resumeChunkInformation.maxValue;
-    var min = this.resumeChunkInformation.minValue;
-    this.resumeChunkInformation.maxValue = activePower > max ? activePower : max;
-    this.resumeChunkInformation.minValue = activePower < min ? activePower : min;
-    this.resumeChunkInformation.stateCount[state]++;
-  }
-
-  resetResumeChunkInformation() {
-    this.resumeChunkInformation = {
-      unloadedThreshold: UNLOADED_THRESHOLD,
-      maxValue: 0,
-      minValue: ACTIVE_POWER_THRESHOLD,
-      stateCount: {
-        off: 0, unloaded: 0, idle: 0, loaded: 0
-      }
-    };
-  }
-
-  /**
-   * Returns the state of the machine based on the current active power value
-   * @param activePower numeric: value from 'Psum_kw' key
-   */
-  getCompressorState(activePower): string {
-    if (activePower === 0) return 'off';
-    if (activePower > 0 && activePower <= UNLOADED_THRESHOLD) return 'unloaded';
-    if (activePower > UNLOADED_THRESHOLD && activePower < IDLE_THRESHOLD) return 'idle';
-    if (activePower > IDLE_THRESHOLD) return 'loaded';
   }
 
   /**
@@ -170,11 +119,10 @@ export class HomeComponent implements OnInit {
   drawChart() {
     // Generate xAxis with dates
     let x = [];
-    _.each(this.slicedData, d => { x = [...x, new Date(+d[0]).toLocaleString()] });
+    _.each(_.map(this.slicedData, 'time'), t => { x = [...x, new Date(+t).toLocaleString()] });
 
     // Generate yAxis with active power values
-    let y = [];
-    _.each(this.slicedData, d => { y = [...y, d[3]] });
+    let y = _.map(this.slicedData, 'activePower');
 
     // If a chart is already drew, clean chart object it before re-draw it
     if (this.chart) {
