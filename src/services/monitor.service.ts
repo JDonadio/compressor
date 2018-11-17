@@ -69,15 +69,30 @@ export class MonitorService {
 
   private processDataChunk(chunk): any {
     var resultDataChunk = [];
+    var prevDate = chunk[0][0];
+    if (prevDate === 'timestamp') prevDate = chunk[1][0];
+
     _.each(chunk, (record: any) => {
-      if (record.indexOf('Psum_kW') > -1) {
-        let result = {
+      if (record.indexOf('Psum_kW') <= -1) return;
+
+      let result = {};
+
+      if (record[0] - prevDate > 30000) {
+        result = {
+          time: +prevDate + ((record[0] - prevDate) / 2),
+          activePower: 0,
+          state: 'off'
+        }
+        console.log('Off state found', result);
+      } else {
+        result = {
           time: record[0],
           activePower: (+record[3]).toFixed(4),
           state: this.getCompressorState(record[3])
         }
-        resultDataChunk = [...resultDataChunk, result];
       }
+      resultDataChunk = [...resultDataChunk, result];
+      prevDate = record[0];
     });
     return _.sortBy(resultDataChunk, 'time');
   }

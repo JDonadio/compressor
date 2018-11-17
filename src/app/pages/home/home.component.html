@@ -6,7 +6,7 @@
   <div *ngIf="error">An error occurs</div>
 
   <!-- canvas -->
-  <div [hidden]="!currentData || !currentData.content">
+  <div [hidden]="!currentData">
     <canvas id="activepower">{{ chart }}</canvas>
   </div>
 
@@ -17,11 +17,11 @@
   </div>
 
   <!-- data -->
-  <div class="table-content" *ngIf="currentData && currentData.content && !loadingData">
+  <div class="table-content" *ngIf="currentData && !loadingData">
 
     <!-- active power information -->
     <div>
-      <div>Chunk: ({{chunk}}/{{completeData.content.length}}). A total of {{currentData.content.length}} records are loaded for this chunk.</div>
+      <div>Chunk: ({{chunk}}/{{completeData.content.length}}). A total of {{currentData.length}} records are loaded for this chunk.</div>
   
       <div class="pagination">
         Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
@@ -31,12 +31,12 @@
       </div>
   
       <table class="table table-hover">
-        <tr><th *ngFor="let header of currentData.headers">{{header.name | uppercase}}</th></tr>
+        <tr><th *ngFor="let header of headers">{{header.name | uppercase}}</th></tr>
       
         <tr *ngFor="let record of slicedData">
           <td><span>{{record.time | date : 'medium'}}</span></td>
           <td><span>Psum_kW</span></td>
-          <td><span>{{record.activePower | uppercase}}</span></td>
+          <td><span>{{record.activePower}}</span></td>
           <td><span>{{record.state | uppercase}}</span></td>
         </tr>
       </table>
