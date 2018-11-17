@@ -4,6 +4,9 @@ import { HttpClient } from "@angular/common/http";
 import { Papa } from 'ngx-papaparse';
 import * as _ from 'lodash';
 
+const ACTIVE_POWER_THRESHOLD: number = 110; // csv max value approach
+const UNLOADED_THRESHOLD: number = 0.2;     // based on derivation monitoring
+const IDLE_THRESHOLD: number = 0.2 * ACTIVE_POWER_THRESHOLD;
 const URL = 'assets/signals.csv';
 const HEADERS = [
   { name: 'DATE', id: 0 },
@@ -16,7 +19,7 @@ const HEADERS = [
   providedIn: 'root'
 })
 export class MonitorService {
-  public data: any;
+  private data: any;
 
   constructor(
     private http: HttpClient,
@@ -52,15 +55,41 @@ export class MonitorService {
    */
   private readAndParseContent(data): Promise<any> {
     return new Promise((resolve, reject) => {
-      let newBuffer: Array<any> = [];
+      let buffer: Array<any> = [];
 
       this.papa.parse(data, {
         chunk: partialResult => {
-          newBuffer = [...newBuffer, partialResult.data];
+          buffer = [...buffer, this.processDataChunk(partialResult.data)];
         },
-        complete: result => resolve(newBuffer),
+        complete: result => resolve(buffer),
         error: error => reject(error)
       });
     })
+  }
+
+  private processDataChunk(chunk): any {
+    var resultDataChunk = [];
+    _.each(chunk, (record: any) => {
+      if (record.indexOf('Psum_kW') > -1) {
+        let result = {
+          time: record[0],
+          activePower: (+record[3]).toFixed(4),
+          state: this.getCompressorState(record[3])
+        }
+        resultDataChunk = [...resultDataChunk, result];
+      }
+    });
+    return _.sortBy(resultDataChunk, 'time');
+  }
+
+  /**
+   * Returns the state of the machine based on the current active power value
+   * @param activePower numeric: value from 'Psum_kw' key
+   */
+  getCompressorState(activePower): string {
+    if (activePower === 0) return 'off';
+    if (activePower > 0 && activePower <= UNLOADED_THRESHOLD) return 'unloaded';
+    if (activePower > UNLOADED_THRESHOLD && activePower < IDLE_THRESHOLD) return 'idle';
+    if (activePower > IDLE_THRESHOLD) return 'loaded';
   }
 }
