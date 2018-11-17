@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   public error: boolean;
   public currentData: any;
   public completeData: any;
+  public headers: Array<string>;
   public resumeChunkInformation: any;
   public slicedData: any;
   public chunk: number;
@@ -33,8 +34,9 @@ export class HomeComponent implements OnInit {
     private chartService: ChartService,
   ) {
     this.loadingData = false;
-    this.currentData = {};
+    this.currentData = null;
     this.completeData = {};
+    this.headers = [];
     this.slicedData = [];
     this.error = null;
     this.chunk = 0;
@@ -50,9 +52,9 @@ export class HomeComponent implements OnInit {
   async ngOnInit() {
     this.loadingData = true;
     this.completeData = await this.monitorService.getCompressorData();
-    this.loadingData = false;
+    this.headers = this.completeData.headers;
     console.log('Complete data', this.completeData);
-    this.currentData.headers = this.completeData.headers;
+    this.loadingData = false;
     this.processDataByChunk(true);
     this.nextPage();
   }
@@ -65,8 +67,8 @@ export class HomeComponent implements OnInit {
     next ? this.chunk++ : this.chunk--;
     if (this.chunk == 0 || this.chunk == this.pagesInChunk) return;
     
-    this.currentData.content = this.completeData.content.slice(this.chunk - 1, this.chunk)[0];
-    this.pagesInChunk = Math.ceil(this.currentData.content.length / this.paginationConfig.recordsInPage);
+    this.currentData = this.completeData.content.slice(this.chunk - 1, this.chunk)[0];
+    this.pagesInChunk = Math.ceil(this.currentData.length / this.paginationConfig.recordsInPage);
     console.log('Current data', this.currentData);
   }
 
@@ -77,7 +79,7 @@ export class HomeComponent implements OnInit {
     this.paginationConfig.currentPage++;
     var skip = (this.paginationConfig.recordsInPage * this.paginationConfig.currentPage)-this.paginationConfig.recordsInPage;
     var next = this.paginationConfig.currentPage * this.paginationConfig.recordsInPage;
-    this.slicedData = _.clone(this.currentData.content.slice(skip, next));
+    this.slicedData = _.clone(this.currentData.slice(skip, next));
     if (this.slicedData.length == 0) this.nextChunk();
     else this.drawChart();
   }
@@ -93,7 +95,7 @@ export class HomeComponent implements OnInit {
     this.paginationConfig.currentPage--;
     var skip = (this.paginationConfig.recordsInPage * this.paginationConfig.currentPage)-this.paginationConfig.recordsInPage;
     var next = this.paginationConfig.currentPage * this.paginationConfig.recordsInPage;
-    this.slicedData = _.clone(this.currentData.content.slice(skip, next));
+    this.slicedData = _.clone(this.currentData.slice(skip, next));
     this.drawChart();
   }
 
@@ -112,7 +114,7 @@ export class HomeComponent implements OnInit {
   previousChunk() {
     if (this.chunk == 1) return;
     this.processDataByChunk(false);
-    this.paginationConfig.currentPage = Math.ceil(this.currentData.content.length/this.paginationConfig.recordsInPage-1);
+    this.paginationConfig.currentPage = Math.ceil(this.currentData.length/this.paginationConfig.recordsInPage-1);
     this.nextPage();
   }
 
