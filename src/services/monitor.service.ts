@@ -20,12 +20,14 @@ const HEADERS = [
 })
 export class MonitorService {
   private data: any;
+  public resume: any;
 
   constructor(
     private http: HttpClient,
     private papa: Papa
   ) {
     this.data = null;
+    this.resume = [];
     console.log('Init monitor service');
   }
 
@@ -69,21 +71,25 @@ export class MonitorService {
 
   private processDataChunk(chunk): any {
     var resultDataChunk = [];
-    var prevDate = chunk[0][0];
-    if (prevDate === 'timestamp') prevDate = chunk[1][0];
+    var totalOffStates = [];
+    var prevTime = chunk[0][0];
+    if (prevTime === 'timestamp') prevTime = chunk[1][0];
 
     _.each(chunk, (record: any) => {
       if (record.indexOf('Psum_kW') <= -1) return;
 
       let result = {};
 
-      if (record[0] - prevDate > 30000) {
+      if (record[0] - prevTime > 30000) {
         result = {
-          time: +prevDate + ((record[0] - prevDate) / 2),
+          time: +prevTime + ((record[0] - prevTime) / 2),
           activePower: 0,
-          state: 'off'
+          state: 'off',
+          from: prevTime,
+          to: record[0],
+          timeOff: record[0] - prevTime
         }
-        console.log('Off state found', result);
+        totalOffStates.push(result);
       } else {
         result = {
           time: record[0],
@@ -92,8 +98,17 @@ export class MonitorService {
         }
       }
       resultDataChunk = [...resultDataChunk, result];
-      prevDate = record[0];
+      prevTime = record[0];
     });
+    let res = {
+      off: totalOffStates,
+      idle: _.filter(resultDataChunk, r => { return r.state === 'idle' }).length,
+      unloaded: _.filter(resultDataChunk, r => { return r.state === 'unloaded' }).length,
+      loaded: _.filter(resultDataChunk, r => { return r.state === 'loaded' }).length,
+      max: _.maxBy(resultDataChunk, 'activePower').activePower,
+      min: _.minBy(resultDataChunk, 'activePower').activePower,
+    }
+    this.resume = [...this.resume, res];
     return _.sortBy(resultDataChunk, 'time');
   }
 
