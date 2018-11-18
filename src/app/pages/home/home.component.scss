@@ -1,14 +1,41 @@
+@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.fade-in {
+  opacity:0;
+  opacity: 1 \9; /*just in case ie*/
+  -webkit-animation:fadeIn ease-in 1;
+  -moz-animation:fadeIn ease-in 1;
+  animation:fadeIn ease-in 1;
+
+  -webkit-animation-fill-mode:forwards;
+  -moz-animation-fill-mode:forwards;
+  animation-fill-mode:forwards;
+
+  -webkit-animation-duration:.5s;
+  -moz-animation-duration:.5s;
+  animation-duration:.5s;
+}
+.current-data {
+  width: 50%;
+}
+.resume-data {
+  width: 30%;
+  padding-top: 2rem;
+}
 .pagination {
   button {
     cursor: pointer;
     margin: .2rem;
-    border-radius: 3px;
+    border-radius: 5px;
   }
   display: inherit !important;
-  margin-top: 1.5rem;
+  margin: .5rem;
 }
 .table-content {
-  margin: 2rem;
+  border-radius: 4px;
+  overflow: hidden;
   text-align: center;
   display: flex;
   justify-content: space-around;
@@ -18,10 +45,8 @@
     border-radius: 1em;
     font-size: 10px;
     display: inline-table;
-    margin-top: 1.5rem;
     text-align: center;
-    padding: 5%;
-    border: 1px solid gray;
+    border: 1px solid #b9b5b53d;
   }
   table.table-hover tbody tr:hover {
     transition: 0.5s;
@@ -40,9 +65,20 @@
     color: white;
   }
 }
-canvas {
-  max-width: 80%;
-  margin: auto;
+.body {
+  text-align: center;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-around;
+}
+.chart {
+  padding: 1rem;
+  canvas {
+    max-width: 80%;
+    margin: auto;
+    box-shadow: 0px 0px 20px 5px #01636f96;
+    border-radius: 4px;
+  }
 }
 .go-to {
   cursor: pointer;
@@ -52,4 +88,9 @@ canvas {
   position: fixed;
   bottom: 3em;
   right: 3em;
+  z-index: 999;
+}
+.spinner {
+  text-align: center;
+  margin-top: 5rem;
 }
