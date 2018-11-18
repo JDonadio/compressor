@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
   public currentData: any;
   public completeData: any;
   public headers: Array<string>;
-  public resumeChunkInformation: any;
+  public resumeDataChunk: any;
   public slicedData: any;
   public chunk: number;
   public pagesInChunk: number;
@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit {
       recordsInPage: 200
     };
     this.chart = null;
-    this.resumeChunkInformation = null;
+    this.resumeDataChunk = null;
   }
   
   async ngOnInit() {
@@ -66,10 +66,10 @@ export class HomeComponent implements OnInit {
   processDataByChunk(next: boolean) {
     next ? this.chunk++ : this.chunk--;
     if (this.chunk == 0 || this.chunk == this.pagesInChunk) return;
-    
+    this.resumeDataChunk = this.monitorService.resume[this.chunk-1];
+    console.log(this.resumeDataChunk)
     this.currentData = this.completeData.content.slice(this.chunk - 1, this.chunk)[0];
     this.pagesInChunk = Math.ceil(this.currentData.length / this.paginationConfig.recordsInPage);
-    console.log('Current data', this.currentData);
   }
 
   /**
