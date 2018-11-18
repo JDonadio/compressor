@@ -17,6 +17,8 @@
   
   <!-- current data table -->
   <div class="current-data">
+    <div>Chunk: ({{chunk}}/{{completeData.content.length}}). A total of {{currentData.length}} records are loaded for this chunk.</div>
+    
     <div class="pagination">
       Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
       <button type="button" class="btn btn-sm btn-outline-info" (click)="previousPage()" 
