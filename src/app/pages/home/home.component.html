@@ -1,35 +1,35 @@
-<div class="content">
+<header>
   <!-- loading spinner -->
-  <div *ngIf="loadingData">Loading data...</div>
-  
+  <div *ngIf="loadingData" class="spinner">
+    <app-spinner></app-spinner>
+  </div>
+
   <!-- error message -->
   <div *ngIf="error">An error occurs</div>
 
   <!-- canvas -->
-  <div [hidden]="!currentData">
+  <div class="chart fade-in" [hidden]="!currentData && loadingData">
     <canvas id="activepower">{{ chart }}</canvas>
   </div>
+</header>
 
-  <!-- scroll to top -->
-  <div class="go-to" *ngIf="showScrolls">
-    <i (click)="goTop()" class="fa fa-3x fa-arrow-circle-up"></i>
-    <i (click)="goBottom()" class="fa fa-3x fa-arrow-circle-down"></i>
-  </div>
-
-  <!-- data -->
-  <div class="table-content" *ngIf="currentData && !loadingData">
-
-    <!-- active power information -->
-    <div>
-      <div>Chunk: ({{chunk}}/{{completeData.content.length}}). A total of {{currentData.length}} records are loaded for this chunk.</div>
+<body *ngIf="currentData && !loadingData" class="fade-in body">
   
-      <div class="pagination">
-        Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
-        <button (click)="previousPage()" [disabled]="paginationConfig.currentPage == 1 && chunk == 1">Previous</button>
-        <button (click)="nextPage()" [disabled]="chunk == completeData.content.length && 
-          paginationConfig.currentPage == pagesInChunk">Next</button>
-      </div>
+  <!-- current data table -->
+  <div class="current-data">
+    <div class="pagination">
+      Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
+      <button type="button" class="btn btn-sm btn-outline-info" (click)="previousPage()" 
+        [disabled]="paginationConfig.currentPage == 1 && chunk == 1">
+        &#60; Previous
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-info" (click)="nextPage()" 
+        [disabled]="chunk == completeData.content.length && paginationConfig.currentPage == pagesInChunk">
+        Next &#62;
+      </button>
+    </div>
   
+    <div class="table-content">
       <table class="table table-hover">
         <tr><th *ngFor="let header of headers">{{header.name | uppercase}}</th></tr>
       
@@ -40,58 +40,65 @@
           <td><span>{{record.state | uppercase}}</span></td>
         </tr>
       </table>
-  
-      <div class="pagination">
-        Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
-        <button (click)="previousPage()" [disabled]="paginationConfig.currentPage == 1 && chunk == 1">Previous</button>
-        <button (click)="nextPage()" [disabled]="chunk == completeData.content.length && 
-          paginationConfig.currentPage == pagesInChunk">Next</button>
-      </div>
     </div>
+  
+    <div class="pagination">
+      Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
+      <button type="button" class="btn btn-sm btn-outline-info" (click)="previousPage()" [disabled]="paginationConfig.currentPage == 1 && chunk == 1">
+        &#60; Previous
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-info" (click)="nextPage()" [disabled]="chunk == completeData.content.length && paginationConfig.currentPage == pagesInChunk">
+        Next &#62;
+      </button>
+    </div>
+  </div>
+  <!-- end current data table -->
 
-    <!-- resume information -->
-    <div *ngIf="resumeDataChunk">
-      <div>Resume chunk information</div>
-
+  <!-- resume data table -->
+  <div class="resume-data">  
+    <div>Resume chunk information</div>
+    
+    <div class="table-content" *ngIf="resumeDataChunk">
       <table class="table table-hover">
-        <thead>
-          <tr><th colspan="2">Active Power threshold</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Maximum active power reached</td>
-            <td>{{resumeDataChunk.max}}</td>
-          </tr>
-          <tr>
-            <td>Minimum active power reached</td>
-            <td>{{resumeDataChunk.min}}</td>
-          </tr>
-        </tbody>
+        <tr><th colspan="2">Active Power threshold</th></tr>
+        <tr>
+          <td>Maximum active power reached</td>
+          <td>{{resumeDataChunk.max}}</td>
+        </tr>
+        <tr>
+          <td>Minimum active power reached</td>
+          <td>{{resumeDataChunk.min}}</td>
+        </tr>
       </table>
-
+    </div>
+  
+    <div class="table-content" *ngIf="resumeDataChunk">
       <table class="table table-hover">
-        <thead>
-          <tr><th colspan="2">States</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Off</td>
-            <td>{{resumeDataChunk.off.length}}</td>
-          </tr>
-          <tr>
-            <td>Unloaded</td>
-            <td>{{resumeDataChunk.unloaded}}</td>
-          </tr>
-          <tr>
-            <td>Idle</td>
-            <td>{{resumeDataChunk.idle}}</td>
-          </tr>
-          <tr>
-            <td>Loaded</td>
-            <td>{{resumeDataChunk.loaded}}</td>
-          </tr>
-        </tbody>
+        <tr><th colspan="2">States</th></tr>
+        <tr>
+          <td>Off</td>
+          <td>{{resumeDataChunk.off.length}}</td>
+        </tr>
+        <tr>
+          <td>Unloaded</td>
+          <td>{{resumeDataChunk.unloaded}}</td>
+        </tr>
+        <tr>
+          <td>Idle</td>
+          <td>{{resumeDataChunk.idle}}</td>
+        </tr>
+        <tr>
+          <td>Loaded</td>
+          <td>{{resumeDataChunk.loaded}}</td>
+        </tr>
       </table>
     </div>
   </div>
-</div>
+  <!-- end resume data table -->
+
+  <!-- scrolls -->
+  <div class="go-to" *ngIf="showScrolls">
+    <i (click)="goTop()" class="fa fa-3x fa-arrow-circle-up"></i>
+    <i (click)="goBottom()" class="fa fa-3x fa-arrow-circle-down"></i>
+  </div>
+</body>

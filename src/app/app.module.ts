@@ -16,11 +16,13 @@ import { HomeComponent } from './pages/home/home.component';
 // SERVICES
 import { MonitorService } from '../services/monitor.service';
 import { ChartService } from '../services/chart.service';
+import { SpinnerComponent } from './spinner/spinner.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    SpinnerComponent
   ],
   imports: [
     BrowserModule,
