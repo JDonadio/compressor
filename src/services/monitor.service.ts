@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 const ACTIVE_POWER_THRESHOLD: number = 110; // csv max value approach
 const UNLOADED_THRESHOLD: number = 0.2;     // based on derivation monitoring
 const IDLE_THRESHOLD: number = 0.2 * ACTIVE_POWER_THRESHOLD;
+const TIME_BETWEEN_RECORDS: number = 30000; // 30 seconds
 const URL = 'assets/signals.csv';
 const HEADERS = [
   { name: 'DATE', id: 0 },
@@ -43,10 +44,41 @@ export class MonitorService {
    */
   private async loadCompressorData() {
     const resp = await this.http.get(URL, { responseType: 'blob' }).toPromise();
-    const content = await this.readAndParseContent(resp);
+    let content = await this.readAndParseContent(resp);
+    content = this.pushOffStates(content);
     this.data = { headers: HEADERS, content };
     console.log('Data loaded successfully.');
     return this.data;
+  }
+
+  private pushOffStates(data: any): any {
+    var firstRecord = data[0][0];
+    var latestRecord = data[data.length - 1][data[data.length - 1].length - 1];
+    var first = {};
+    var latest = {};
+    var firstDate = new Date(+firstRecord.time);
+    var latestDate = new Date(+latestRecord.time);
+    
+    firstDate.setHours(0, 0, 0, 0);
+
+    first = {
+      time: firstDate, 
+      activePower: 0, 
+      state: 'off',
+    }
+    
+    latestDate.setDate(latestDate.getDate() + 1);
+    latestDate.setHours(23, 59, 59, 0);
+    
+    latest = {
+      time: latestDate, 
+      activePower: 0, 
+      state: 'off',
+    }
+
+    data[0].splice(0, 0, first);
+    data[data.length - 1].push(latest);
+    return data;
   }
 
   /**
@@ -78,45 +110,72 @@ export class MonitorService {
     _.each(chunk, (record: any) => {
       if (record.indexOf('Psum_kW') <= -1) return;
 
-      let result = {};
-
       if (record[0] - prevTime > 30000) {
-        result = {
-          time: +prevTime + ((record[0] - prevTime) / 2),
+        let off = {
           activePower: 0,
           state: 'off',
           from: prevTime,
           to: record[0],
-          timeOff: record[0] - prevTime
+          time: record[0] - prevTime
         }
-        totalOffStates.push(result);
+        totalOffStates.push(off);
       } else {
-        result = {
+        let result = {
           time: record[0],
           activePower: (+record[3]).toFixed(4),
           state: this.getCompressorState(record[3])
         }
+        resultDataChunk = [...resultDataChunk, result];
       }
-      resultDataChunk = [...resultDataChunk, result];
       prevTime = record[0];
     });
+    this.setResumeDataChunk(resultDataChunk, totalOffStates);
+    return _.sortBy(resultDataChunk, 'time');
+  }
+
+  private setResumeDataChunk(dataChunk, offStates) {
+    var idleStates = _.filter(dataChunk, r => { return r.state === 'idle' });
+    var unloadedStates = _.filter(dataChunk, r => { return r.state === 'unloaded' });
+    var loadedStates = _.filter(dataChunk, r => { return r.state === 'loaded' });
+
     let res = {
-      off: totalOffStates,
-      idle: _.filter(resultDataChunk, r => { return r.state === 'idle' }).length,
-      unloaded: _.filter(resultDataChunk, r => { return r.state === 'unloaded' }).length,
-      loaded: _.filter(resultDataChunk, r => { return r.state === 'loaded' }).length,
-      max: _.maxBy(resultDataChunk, 'activePower').activePower,
-      min: _.minBy(resultDataChunk, 'activePower').activePower,
+      off: {
+        count: offStates.length,
+        time: _.sumBy(offStates, 'time'),
+        timeStr: this.getTimeStr(_.sumBy(offStates, 'time'))
+      },
+      idle: {
+        count: idleStates.length,
+        time: idleStates.length * TIME_BETWEEN_RECORDS,
+        timeStr: this.getTimeStr(idleStates.length * TIME_BETWEEN_RECORDS)
+      },
+      unloaded: {
+        count: unloadedStates.length,
+        time: unloadedStates.length * TIME_BETWEEN_RECORDS,
+        timeStr: this.getTimeStr(unloadedStates.length * TIME_BETWEEN_RECORDS)
+      },
+      loaded: {
+        count: loadedStates.length,
+        time: loadedStates.length * TIME_BETWEEN_RECORDS,
+        timeStr: this.getTimeStr(loadedStates.length * TIME_BETWEEN_RECORDS)
+      },
+      max: _.maxBy(dataChunk, 'activePower')['activePower'],
+      min: _.minBy(dataChunk, 'activePower')['activePower'],
     }
     this.resume = [...this.resume, res];
-    return _.sortBy(resultDataChunk, 'time');
+  }
+
+  private getTimeStr(time): string {
+    let date = new Date(null);
+    date.setSeconds(time / 1000);
+    return date.toISOString().substr(11, 8);
   }
 
   /**
    * Returns the state of the machine based on the current active power value
    * @param activePower numeric: value from 'Psum_kw' key
    */
-  getCompressorState(activePower): string {
+  private getCompressorState(activePower): string {
     if (activePower === 0) return 'off';
     if (activePower > 0 && activePower <= UNLOADED_THRESHOLD) return 'unloaded';
     if (activePower > UNLOADED_THRESHOLD && activePower < IDLE_THRESHOLD) return 'idle';
