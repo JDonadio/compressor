@@ -44,8 +44,8 @@ export class MonitorService {
    */
   private async loadCompressorData() {
     const resp = await this.http.get(URL, { responseType: 'blob' }).toPromise();
-    let content = await this.readAndParseContent(resp);
-    content = this.pushOffStates(content);
+    const content = await this.readAndParseContent(resp);
+    this.pushOffStates(content);
     this.data = { headers: HEADERS, content };
     console.log('Data loaded successfully.');
     return this.data;
@@ -54,31 +54,21 @@ export class MonitorService {
   private pushOffStates(data: any): any {
     var firstRecord = data[0][0];
     var latestRecord = data[data.length - 1][data[data.length - 1].length - 1];
-    var first = {};
-    var latest = {};
-    var firstDate = new Date(+firstRecord.time);
-    var latestDate = new Date(+latestRecord.time);
-    
-    firstDate.setHours(0, 0, 0, 0);
 
-    first = {
-      time: firstDate, 
-      activePower: 0, 
-      state: 'off',
-    }
+    var firstDate = new Date(+firstRecord.time);
+    firstDate.setHours(0, 0, 0, 0);
     
+    var latestDate = new Date(+latestRecord.time);
     latestDate.setDate(latestDate.getDate() + 1);
     latestDate.setHours(23, 59, 59, 0);
-    
-    latest = {
-      time: latestDate, 
-      activePower: 0, 
-      state: 'off',
-    }
 
-    data[0].splice(0, 0, first);
-    data[data.length - 1].push(latest);
-    return data;
+    this.resume[0]['off'].count = this.resume[0]['off'].count++;
+    this.resume[0]['off'].time = this.resume[0]['off'].time + (firstRecord.time - firstDate.getTime());
+    this.resume[0]['off'].timeStr = this.getTimeStr(this.resume[0]['off'].time);
+
+    this.resume[this.resume.length - 1]['off'].count = this.resume[0]['off'].count++;
+    this.resume[this.resume.length - 1]['off'].time = this.resume[0]['off'].time + (latestDate.getTime() - latestRecord.time);
+    this.resume[this.resume.length - 1]['off'].timeStr = this.getTimeStr(this.resume[0]['off'].time);
   }
 
   /**
