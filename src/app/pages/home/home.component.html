@@ -18,7 +18,7 @@
   <!-- current data table -->
   <div class="current-data">
     <div>Chunk: ({{chunk}}/{{completeData.content.length}}). A total of {{currentData.length}} records are loaded for this chunk.</div>
-    
+
     <div class="pagination">
       Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
       <button type="button" class="btn btn-sm btn-outline-info" (click)="previousPage()" 
@@ -36,7 +36,7 @@
         <tr><th *ngFor="let header of headers">{{header.name | uppercase}}</th></tr>
       
         <tr *ngFor="let record of slicedData">
-          <td><span>{{record.time | date : 'medium'}}</span></td>
+          <td><span>{{record.time | date : 'dd/MM/yyy HH:mm:ss'}}</span></td>
           <td><span>Psum_kW</span></td>
           <td><span>{{record.activePower}}</span></td>
           <td><span>{{record.state | uppercase}}</span></td>
@@ -46,10 +46,12 @@
   
     <div class="pagination">
       Page {{paginationConfig.currentPage}} of {{pagesInChunk}}
-      <button type="button" class="btn btn-sm btn-outline-info" (click)="previousPage()" [disabled]="paginationConfig.currentPage == 1 && chunk == 1">
+      <button type="button" class="btn btn-sm btn-outline-info" (click)="previousPage()" 
+        [disabled]="paginationConfig.currentPage == 1 && chunk == 1">
         &#60; Previous
       </button>
-      <button type="button" class="btn btn-sm btn-outline-info" (click)="nextPage()" [disabled]="chunk == completeData.content.length && paginationConfig.currentPage == pagesInChunk">
+      <button type="button" class="btn btn-sm btn-outline-info" (click)="nextPage()" 
+        [disabled]="chunk == completeData.content.length && paginationConfig.currentPage == pagesInChunk">
         Next &#62;
       </button>
     </div>
@@ -59,10 +61,10 @@
   <!-- resume data table -->
   <div class="resume-data">  
     <div>Resume chunk information</div>
-    
+
     <div class="table-content" *ngIf="resumeDataChunk">
       <table class="table table-hover">
-        <tr><th colspan="2">Active Power threshold</th></tr>
+        <tr><th colspan="2">Active Power thresholds</th></tr>
         <tr>
           <td>Maximum active power reached</td>
           <td>{{resumeDataChunk.max}}</td>
@@ -76,22 +78,30 @@
   
     <div class="table-content" *ngIf="resumeDataChunk">
       <table class="table table-hover">
-        <tr><th colspan="2">States</th></tr>
         <tr>
-          <td>Off</td>
-          <td>{{resumeDataChunk.off.length}}</td>
+          <th>State</th>
+          <th>Count</th>
+          <th>Time</th>
         </tr>
         <tr>
-          <td>Unloaded</td>
-          <td>{{resumeDataChunk.unloaded}}</td>
+          <td>OFF</td>
+          <td>{{resumeDataChunk.off.count}}</td>
+          <td>{{resumeDataChunk.off.timeStr}}</td>
         </tr>
         <tr>
-          <td>Idle</td>
-          <td>{{resumeDataChunk.idle}}</td>
+          <td>UNLOADED</td>
+          <td>{{resumeDataChunk.unloaded.count}}</td>
+          <td>{{resumeDataChunk.unloaded.timeStr}}</td>
         </tr>
         <tr>
-          <td>Loaded</td>
-          <td>{{resumeDataChunk.loaded}}</td>
+          <td>IDLE</td>
+          <td>{{resumeDataChunk.idle.count}}</td>
+          <td>{{resumeDataChunk.idle.timeStr}}</td>
+        </tr>
+        <tr>
+          <td>LOADED</td>
+          <td>{{resumeDataChunk.loaded.count}}</td>
+          <td>{{resumeDataChunk.loaded.timeStr}}</td>
         </tr>
       </table>
     </div>

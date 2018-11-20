@@ -66,8 +66,7 @@ export class HomeComponent implements OnInit {
   processDataByChunk(next: boolean) {
     next ? this.chunk++ : this.chunk--;
     if (this.chunk == 0 || this.chunk == this.pagesInChunk) return;
-    this.resumeDataChunk = this.monitorService.resume[this.chunk-1];
-    console.log(this.resumeDataChunk)
+    this.resumeDataChunk = this.monitorService.resume[this.chunk-1];    
     this.currentData = this.completeData.content.slice(this.chunk - 1, this.chunk)[0];
     this.pagesInChunk = Math.ceil(this.currentData.length / this.paginationConfig.recordsInPage);
   }
